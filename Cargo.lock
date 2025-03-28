@@ -402,6 +402,7 @@ dependencies = [
  "pkcs1",
  "pkcs8",
  "rand_core",
+ "sha2",
  "signature",
  "subtle",
  "zeroize",
