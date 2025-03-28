@@ -1,10 +1,10 @@
 use crypto_utils::prelude::*;
+use crypto_utils::symmetric::SymmetricCipher;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!(
-        "=== AES Encryption Examples ===
-"
-    );
+/// # 运行 AES 加密示例
+/// cargo run --example aes_example
+fn main() -> Result<(), anyhow::Error> {
+    println!("=== AES Encryption Examples ===");
 
     // Generate a random AES-256 key
     let key = generate_random_key(32);
@@ -17,8 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cipher = AesCbc::new(&key, None)?;
     let encrypted = cipher.encrypt_str(plaintext)?;
     println!(
-        "
-AES-CBC Encrypted (Base64): {}",
+        "AES-CBC Encrypted (Base64): {}",
         encrypted
     );
 
@@ -29,8 +28,7 @@ AES-CBC Encrypted (Base64): {}",
     let ecb_cipher = AesEcb::new(&key)?;
     let ecb_encrypted = ecb_cipher.encrypt_str(plaintext)?;
     println!(
-        "
-AES-ECB Encrypted (Base64): {}",
+        "AES-ECB Encrypted (Base64): {}",
         ecb_encrypted
     );
 
@@ -39,11 +37,10 @@ AES-ECB Encrypted (Base64): {}",
 
     // Example with convenience functions
     println!(
-        "
-=== Using Convenience Functions ==="
+        "=== Using Convenience Functions ==="
     );
 
-    let aes128_key: [u8; 16] = key[0..16].try_into().unwrap();
+    let aes128_key: [u8; 16] = key[0..16].try_into()?;
     let encrypted = aes128_cbc_encrypt(&aes128_key, plaintext.as_bytes(), None)?;
     println!("AES-128 Encrypted: {}", encrypted);
 

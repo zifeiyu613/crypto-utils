@@ -5,27 +5,27 @@ edition = "2024"
 authors = ["qiangren0613@gmail.com"]
 description = "A comprehensive cryptography utility library"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/zifeiyu613/crypto-utils"
+repository = "https://github.com/zifeiyu613/crypto-utils.git"
 keywords = ["crypto", "encryption", "security", "aes", "des"]
 categories = ["cryptography"]
 
 [dependencies]
-cipher = {version = "0",  features = ["block-padding", "alloc"]}
-aes = "0"
-des = "0"
-cbc = "0"
-rsa = {version = "0", features = ["sha2"]}
+cipher = {version = "0.4",  features = ["block-padding", "alloc"]}
+aes = "0.8"
+des = "0.8"
+cbc = "0.1"
+rsa = {version = "0.9", features = ["sha2"]}
 
 
-hmac = "0"
-pbkdf2 = "0"
-base64 = "0"
+hmac = "0.12"
+pbkdf2 = "0.12"
+base64 = "0.22"
 
 hex = "0.4"
-rand = "0"
-thiserror = "2"
+rand = "0.8"
+thiserror = "2.0"
 sha2 = "0.10"
 
 
 [dev-dependencies]
-anyhow = "1"
+anyhow = "1.0"

@@ -1,7 +1,6 @@
 //! RSA encryption implementation
 
-use rsa::{
-    PublicKey, RsaPrivateKey, RsaPublicKey,
+use rsa::{RsaPrivateKey, RsaPublicKey,
     pkcs8::{EncodePublicKey, EncodePrivateKey, DecodePublicKey, DecodePrivateKey},
     Pkcs1v15Encrypt, Pkcs1v15Sign
 };

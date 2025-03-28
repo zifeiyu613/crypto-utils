@@ -74,8 +74,6 @@ impl SymmetricCipher for AesCbc {
             }
         };
 
-        let data_len = data.len();
-
         match self.key.len() {
             16 => {
                 type Aes128CbcEnc = cbc::Encryptor<Aes128>;
@@ -83,10 +81,7 @@ impl SymmetricCipher for AesCbc {
                     CryptoError::EncryptionError("Failed to initialize cipher".into())
                 })?;
 
-                let mut buffer = data.to_vec();
-                let ciphertext = cipher
-                    .encrypt_padded_mut::<Pkcs7>(&mut buffer, data_len)
-                    .map_err(|_| CryptoError::EncryptionError("Failed to encrypt data".into()))?;
+                let ciphertext = cipher.encrypt_padded_vec_mut::<Pkcs7>(data);
 
                 let mut result = iv;
                 result.extend_from_slice(&ciphertext);
@@ -99,10 +94,7 @@ impl SymmetricCipher for AesCbc {
                     CryptoError::EncryptionError("Failed to initialize cipher".into())
                 })?;
 
-                let mut buffer = data.to_vec();
-                let ciphertext = cipher
-                    .encrypt_padded_mut::<Pkcs7>(&mut buffer, data_len)
-                    .map_err(|_| CryptoError::EncryptionError("Failed to encrypt data".into()))?;
+                let ciphertext = cipher.encrypt_padded_vec_mut::<Pkcs7>(data);
 
                 let mut result = iv;
                 result.extend_from_slice(&ciphertext);
@@ -115,9 +107,8 @@ impl SymmetricCipher for AesCbc {
                     CryptoError::EncryptionError("Failed to initialize cipher".into())
                 })?;
 
-                let mut buffer = data.to_vec();
-                let ciphertext = cipher.encrypt_padded_mut::<Pkcs7>(&mut buffer, data_len)
-                    .map_err(|_| CryptoError::EncryptionError("Failed to encrypt data".into()))?;
+                // let mut buffer = data.to_vec();
+                let ciphertext = cipher.encrypt_padded_vec_mut::<Pkcs7>(data);
 
                 let mut result = iv;
                 result.extend_from_slice(&ciphertext);

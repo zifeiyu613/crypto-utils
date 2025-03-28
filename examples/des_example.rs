@@ -1,6 +1,8 @@
+use rand::Rng;
 use crypto_utils::prelude::*;
+use crypto_utils::symmetric::SymmetricCipher;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), anyhow::Error> {
     println!("=== DES Encryption Examples ===
 ");
 

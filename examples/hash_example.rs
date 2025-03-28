@@ -1,6 +1,6 @@
 use crypto_utils::prelude::*;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), anyhow::Error> {
     println!("=== Hashing Examples ===
 ");
 

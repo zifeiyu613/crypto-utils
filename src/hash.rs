@@ -1,6 +1,5 @@
 //! Hash function implementations
 
-use base64::Engine;
 use sha2::{Sha256, Sha512, Digest};
 use hmac::{Hmac, Mac};
 use pbkdf2::pbkdf2;
