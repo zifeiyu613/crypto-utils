@@ -130,6 +130,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #### AES Encryption
 
 ```rust
+
 // AES-256 CBC mode (recommended)
 let key = generate_random_key(32); // 32 bytes = 256 bits
 let cipher = AesCbc::new(&key, None)?; // Random IV will be generated
