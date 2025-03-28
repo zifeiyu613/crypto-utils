@@ -1,0 +1,31 @@
+[package]
+name = "crypto-utils"
+version = "0.1.0"
+edition = "2024"
+authors = ["qiangren0613@gmail.com"]
+description = "A comprehensive cryptography utility library"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zifeiyu613/crypto-utils"
+keywords = ["crypto", "encryption", "security", "aes", "des"]
+categories = ["cryptography"]
+
+[dependencies]
+cipher = {version = "0",  features = ["block-padding", "alloc"]}
+aes = "0"
+des = "0"
+cbc = "0"
+rsa = "0"
+
+
+sha2 = "0"
+hmac = "0"
+pbkdf2 = "0"
+base64 = "0"
+
+hex = "0.4.3"
+rand = "0"
+thiserror = "2"
+
+
+[dev-dependencies]
+anyhow = "1"
