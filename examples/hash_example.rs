@@ -24,8 +24,7 @@ fn main() -> Result<(), anyhow::Error> {
 
     let hasher = PasswordHasher::default();
     let password_hash = hasher.hash_password(password)?;
-    println!("
-Password hash: {}", password_hash);
+    println!("Password hash: {}", password_hash);
 
     // Verify password
     let is_valid = hasher.verify_password(password, &password_hash)?;
