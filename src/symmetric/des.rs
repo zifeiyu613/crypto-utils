@@ -140,7 +140,7 @@ pub fn des_encrypt_string(key: &[u8; 8], data: &str, iv: Option<[u8; 8]>) -> Cry
 }
 
 /// Convenience function to decrypt a Base64 string to a string using DES-CBC
-pub fn des_decrypt_string(key: &[u8; 8], data: &str) -> CryptoResult<String> {
-    let cipher = DesCbc::new(key, None)?;
+pub fn des_decrypt_string(key: &[u8; 8], data: &str, iv: Option<[u8; 8]>) -> CryptoResult<String> {
+    let cipher = DesCbc::new(key, iv)?;
     cipher.decrypt_str(data)
 }
