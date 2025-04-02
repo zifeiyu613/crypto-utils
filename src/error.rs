@@ -31,6 +31,8 @@ pub enum CryptoError {
 
     #[error("Unsupported operation: {0}")]
     UnsupportedOperation(String),
+
+
 }
 
 /// Result type for all crypto operations

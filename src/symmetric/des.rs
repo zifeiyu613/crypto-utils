@@ -1,5 +1,6 @@
 //! DES encryption implementations
 
+use std::error::Error;
 use cipher::generic_array::GenericArray;
 use cipher::{BlockDecrypt, BlockEncrypt, KeyInit};
 use des::Des;
@@ -35,7 +36,11 @@ impl DesCbc {
                 iv_array.copy_from_slice(&iv_data);
                 Some(iv_array)
             },
-            None => None,
+            None => {
+                let mut random_iv = [0u8; 8];
+                thread_rng().fill(&mut random_iv);
+                Some(random_iv)
+            },
         };
 
         Ok(Self { key: key_array, iv: iv_opt })
@@ -44,71 +49,54 @@ impl DesCbc {
 
 impl SymmetricCipher for DesCbc {
     fn encrypt(&self, data: &[u8]) -> CryptoResult<String> {
-        // Generate IV if not provided
-        let iv = self.iv.unwrap_or_else(|| {
-            let mut random_iv = [0u8; 8];
-            thread_rng().fill(&mut random_iv);
-            random_iv
-        });
 
-        // PKCS7 padding
         let padded_data = pkcs7_pad(data, 8);
 
         let key = GenericArray::from(self.key);
         let cipher = Des::new(&key);
 
-        let mut encrypted_data = Vec::with_capacity(padded_data.len() + 8); // Add space for IV
+        let mut encrypted_data = Vec::with_capacity(padded_data.len());
 
-        // Store IV as prefix
-        encrypted_data.extend_from_slice(&iv);
+        // 生成随机IV
+        let mut iv = self.iv.unwrap();
 
-        let mut current_iv = iv;
-
-        // CBC mode encryption
+        // CBC 模式加密
         for chunk in padded_data.chunks(8) {
-            // XOR with IV or previous ciphertext block
+            // 与 IV 或前一个密文块异或
             let mut block = [0u8; 8];
             for i in 0..8 {
-                block[i] = chunk[i] ^ current_iv[i];
+                block[i] = chunk[i] ^ iv[i];
             }
-
             let mut block = GenericArray::from(block);
             cipher.encrypt_block(&mut block);
 
-            // Update IV to current ciphertext block
-            current_iv.copy_from_slice(block.as_slice());
+            // 更新 IV 为当前密文块
+            iv.copy_from_slice(block.as_slice());
 
             encrypted_data.extend_from_slice(block.as_slice());
         }
-
-        // Return Base64 encoded ciphertext
+        // Base64编码
         encode_base64(&encrypted_data)
     }
 
+    // key: [u8; 8], iv: [u8; 8],
     fn decrypt(&self, data: &str) -> CryptoResult<Vec<u8>> {
         let decoded = decode_base64(data)?;
 
-        // Extract IV and ciphertext
-        if decoded.len() < 8 {
-            return Err(CryptoError::InvalidData("Ciphertext too short".into()));
+        // 验证密文长度
+        if decoded.len() < 16 || (decoded.len() - 8) % 8 != 0 {
+            return Err(CryptoError::InvalidData("Invalid ciphertext length".into()));
         }
-
-        let (iv_slice, encrypted_data) = decoded.split_at(8);
-        let mut iv = [0u8; 8];
-        iv.copy_from_slice(iv_slice);
+        let encrypted_data = &decoded;
 
         let key = GenericArray::from(self.key);
         let cipher = Des::new(&key);
 
         let mut decrypted_data = Vec::with_capacity(encrypted_data.len());
-        let mut current_iv = iv;
+        let mut current_iv = self.iv.unwrap();
 
-        // CBC mode decryption
+        // CBC 模式解密
         for chunk in encrypted_data.chunks(8) {
-            if chunk.len() != 8 {
-                return Err(CryptoError::InvalidData("Invalid ciphertext length".into()));
-            }
-
             let mut block = [0u8; 8];
             block.copy_from_slice(chunk);
 
@@ -116,21 +104,19 @@ impl SymmetricCipher for DesCbc {
             let mut decrypted_block = encrypted_block.clone();
             cipher.decrypt_block(&mut decrypted_block);
 
-            // XOR with IV
+            // 与 IV 异或
             for i in 0..8 {
                 block[i] = decrypted_block[i] ^ current_iv[i];
             }
-
-            // Update IV to current ciphertext block
+            // 更新 IV 为上一个密文块
             current_iv.copy_from_slice(chunk);
-
             decrypted_data.extend_from_slice(&block);
         }
 
-        // Remove PKCS7 padding
-        pkcs7_unpad(&decrypted_data)
-            .map_err(|_| CryptoError::InvalidPadding("Invalid PKCS7 padding".into()))
+        let decrypted_data = pkcs7_unpad(&decrypted_data)?;
+        Ok(decrypted_data)
     }
+
 }
 
 // Convenience functions

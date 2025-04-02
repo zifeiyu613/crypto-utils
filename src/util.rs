@@ -16,33 +16,55 @@ pub fn decode_base64(encoded: &str) -> CryptoResult<Vec<u8>> {
 }
 
 /// Apply PKCS7 padding to data for the given block size
+// pub fn pkcs7_pad(data: &[u8], block_size: usize) -> Vec<u8> {
+//     let pad_len = block_size - (data.len() % block_size);
+//     let mut padded = Vec::with_capacity(data.len() + pad_len);
+//     padded.extend_from_slice(data);
+//     padded.extend(vec![pad_len as u8; pad_len]);
+//     padded
+// }
+
+// PKCS7填充函数
+// pub fn pkcs7_pad(data: &[u8], block_size: usize) -> Vec<u8> {
+//     let padding_length = block_size - (data.len() % block_size);
+//     let mut padded = data.to_vec();
+//     padded.extend(std::iter::repeat(padding_length as u8).take(padding_length));
+//     padded
+// }
+
+// PKCS7 填充
 pub fn pkcs7_pad(data: &[u8], block_size: usize) -> Vec<u8> {
+    let mut padded = data.to_vec();
     let pad_len = block_size - (data.len() % block_size);
-    let mut padded = Vec::with_capacity(data.len() + pad_len);
-    padded.extend_from_slice(data);
     padded.extend(vec![pad_len as u8; pad_len]);
     padded
 }
 
-/// Remove PKCS7 padding from data
+
+// PKCS7去填充函数
 pub fn pkcs7_unpad(data: &[u8]) -> CryptoResult<Vec<u8>> {
     if data.is_empty() {
-        return Err(CryptoError::InvalidPadding("Empty data".into()));
+        return Err(CryptoError::InvalidData("Empty data".into()));
     }
 
-    let last_byte = *data.last().unwrap() as usize;
-    if last_byte == 0 || last_byte > data.len() {
-        return Err(CryptoError::InvalidPadding("Invalid padding value".into()));
+    let padding_length = data[data.len() - 1] as usize;
+
+    // 验证填充长度的有效性
+    if padding_length == 0 || padding_length > 8 {
+        return Err(CryptoError::InvalidData("Invalid padding".into()));
     }
 
-    // Validate padding
-    let padding_start = data.len() - last_byte;
-    if !data[padding_start..].iter().all(|&x| x == last_byte as u8) {
-        return Err(CryptoError::InvalidPadding("Inconsistent padding bytes".into()));
+    // 检查填充是否一致
+    for i in 1..=padding_length {
+        if data[data.len() - i] != padding_length as u8 {
+            return Err(CryptoError::InvalidData("Invalid padding".into()));
+        }
     }
 
-    Ok(data[..padding_start].to_vec())
+    // 返回去除填充后的原始数据
+    Ok(data[..data.len() - padding_length].to_vec())
 }
+
 
 /// Generate a random key of the specified length
 pub fn generate_random_key(length: usize) -> Vec<u8> {

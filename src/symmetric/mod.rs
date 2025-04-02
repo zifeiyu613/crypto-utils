@@ -19,7 +19,6 @@ pub trait SymmetricCipher {
     /// Convenience method for decrypting to a string
     fn decrypt_str(&self, data: &str) -> crate::error::CryptoResult<String> {
         let bytes = self.decrypt(data)?;
-        String::from_utf8(bytes)
-            .map_err(|_| crate::error::CryptoError::InvalidData("Invalid UTF-8 data".into()))
+        Ok(String::from_utf8_lossy(&bytes).to_string())
     }
 }

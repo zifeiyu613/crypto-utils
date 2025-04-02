@@ -16,10 +16,11 @@ des = "0.8"
 cbc = "0.1"
 rsa = {version = "0.9", features = ["sha2"]}
 
-
 hmac = "0.12"
 pbkdf2 = "0.12"
 base64 = "0.22"
+
+ring = "0.17"
 
 hex = "0.4"
 rand = "0.8"

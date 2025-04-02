@@ -263,7 +263,6 @@ where
     }
 
     pkcs7_unpad(&decrypted_data)
-        .map_err(|e| CryptoError::InvalidPadding(e.to_string()))
 }
 
 // Convenience functions
